@@ -2,9 +2,9 @@
 
 Run from the AIClass_PythonCode folder:
 
-    uv run --project agents python try_requirements.py              # sample CVEs, model on Colab (from .env)
-    uv run --project agents python try_requirements.py --cves my.json
-    uv run --project agents python try_requirements.py --demo       # fake model: checks the plumbing only
+    uv run --project agents python tests/try_requirements.py              # sample CVEs, model on Colab (from .env)
+    uv run --project agents python tests/try_requirements.py --cves my.json
+    uv run --project agents python tests/try_requirements.py --demo       # fake model: checks the plumbing only
 
 It runs the very same LangGraph subgraph the chat does (router/requirements_graph.py). For each
 component (one system), one after another:
@@ -30,7 +30,8 @@ from dotenv import dotenv_values
 from router.requirements_graph import MAX_REVIEWS, run_requirements
 from writer.requirements_report import build_requirements_report
 
-HERE = Path(__file__).resolve().parent
+# This file lives in tests/, but .env and requirements_run/ stay in the project folder (one level up).
+HERE = Path(__file__).resolve().parent.parent
 OUT_DIR = HERE / "requirements_run"
 
 # Sample data: short paraphrases written for this exercise, not copied NVD text.

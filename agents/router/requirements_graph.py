@@ -1,7 +1,7 @@
 """The requirements loop as a LangGraph SUBGRAPH.
 
 One graph, used twice: the app's main graph (router/graph.py) runs it as a single node, and
-run_requirements() below runs it on its own for scripts and tests (try_requirements.py). So the
+run_requirements() below runs it on its own for scripts and tests (tests/try_requirements.py). So the
 loop is written once.
 
 The loop, one component (one of the user's systems) at a time:

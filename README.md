@@ -39,7 +39,6 @@ The agents are wired together with [LangGraph](https://langchain-ai.github.io/la
 ```text
 AIClass_PythonCode/
 ├── CVE_TASK.py                  # The Streamlit chat app (start here)
-├── try_requirements.py          # Run the requirements loop without the chat
 ├── colab_server.ipynb           # Colab notebook that runs the Qwen model
 ├── pyproject.toml               # Project dependencies (managed with uv)
 ├── .env.example                 # Copy to .env and fill in your values
@@ -92,6 +91,7 @@ AIClass_PythonCode/
 │                                # (each skill folder holds one SKILL.md)
 │
 └── tests/                       # Automated tests (no network or model needed)
+    └── try_requirements.py      # Not a test: runs the requirements loop without the chat
 ```
 
 ## Setup
@@ -121,8 +121,8 @@ You can also paste the Colab URL and key into the app's sidebar instead of using
 Try the requirements loop without the chat. `--demo` uses a fake model, so it only checks that the plumbing works.
 
 ```
-uv run --project agents python try_requirements.py --demo
-uv run --project agents python try_requirements.py
+uv run --project agents python tests/try_requirements.py --demo
+uv run --project agents python tests/try_requirements.py
 ```
 
 Run the tests:
@@ -152,7 +152,7 @@ Under the table, code (not the model) lists the records that were excluded and w
 - a table with columns ID, Requirement, CVE, CWE, Verification and Quality check (**Pass** or **Needs review**)
 - the issues the Evaluator found
 
-Full results are also saved as JSON in `requirements_run/` when you use `try_requirements.py`.
+Full results are also saved as JSON in `requirements_run/` when you use `tests/try_requirements.py`.
 
 ## Built with
 
