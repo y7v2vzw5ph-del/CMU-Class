@@ -32,6 +32,49 @@ In the chat, type **`CVECheck`** or ask about a specific CVE such as `CVE-2024-2
 
 The agents are wired together with [LangGraph](https://langchain-ai.github.io/langgraph/). The chat pauses whenever it needs your reply, and your next message resumes the same run.
 
+**How the agents are connected.** This diagram is generated from the real graph in `agents/router/graph.py` (the same picture the app shows in its sidebar), so it never drifts from the code.
+
+```mermaid
+flowchart TD
+  user_message(["User message"])
+  final_answer(["Answer"])
+  router["<b>Router</b>"]
+  systems_expert["<b>Systems Expert</b>"]
+  vulnerability_expert["<b>Vulnerability Expert</b>"]
+  evaluator["<b>Evaluator</b>"]
+  writer["<b>Writer</b>"]
+  evaluator -.-> vulnerability_expert
+  evaluator -.-> writer
+  router --> final_answer
+  router -.-> systems_expert
+  router -.-> vulnerability_expert
+  router -.-> writer
+  systems_expert --> router
+  systems_expert -.-> vulnerability_expert
+  systems_expert -.-> writer
+  user_message --> router
+  vulnerability_expert --> evaluator
+  vulnerability_expert -.-> systems_expert
+  vulnerability_expert -.-> writer
+  writer --> router
+  classDef c_router fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#111827
+  class router c_router
+  classDef c_systems_expert fill:#ffedd5,stroke:#ea580c,stroke-width:2px,color:#111827
+  class systems_expert c_systems_expert
+  classDef c_vulnerability_expert fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#111827
+  class vulnerability_expert c_vulnerability_expert
+  classDef c_evaluator fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#111827
+  class evaluator c_evaluator
+  classDef c_writer fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#111827
+  class writer c_writer
+  classDef c_edge fill:#ffffff,stroke:#6b7280,stroke-dasharray:4 3,color:#111827
+  class user_message,final_answer c_edge
+```
+
+- **Solid arrow:** always happens. **Dotted arrow:** depends on a decision, such as the Router picking a route or the Evaluator sending work back for a rewrite. The diagram shows every possible path, not the path of one question.
+- **The dotted Router-to-Writer arrow** is a safety shortcut. If you say yes to requirements but there are no CVE records to write them for, the requirements loop ends at once and the Router's route goes straight to the Writer. Normally the Router never hands work to the Writer. The Writer is reached at the end of the Systems Expert, Vulnerability Expert or Evaluator path, and it hands the result back to the Router to show you.
+- If you change `agents/router/graph.py`, regenerate the diagram with `uv run --project agents python -c "from router.graph_diagram import sidebar_diagram; print(sidebar_diagram())"` and paste the output here.
+
 **The model checks nothing alone.** The model (Qwen2.5-3B-Instruct, a small model) writes text and labels things. Plain Python code then checks its work against the real data: CVE ids, scores, tables and quotes. If the model's answer is wrong, code fixes it or builds the result itself. A made-up CVE or CWE is rejected. The sidebar shows which agent is working, and **Show agent steps** lets you see what each agent passed on.
 
 ## Project layout
@@ -98,7 +141,7 @@ AIClass_PythonCode/
 
 You need [uv](https://docs.astral.sh/uv/) and a Google account for Colab.
 
-**1. Start the model on Colab.** Open `colab_server.ipynb` in Google Colab and run it. It starts the model and prints a public URL and an API key.
+**1. Start the model on Colab.** Open `colab_server.ipynb` in Google Colab and run it. It starts the model and prints a **public URL** and an **API key**.
 
 **2. Create a `.env` file** in this folder by copying `.env.example` and filling in the values. Never commit `.env`. It is already in `.gitignore`.
 
